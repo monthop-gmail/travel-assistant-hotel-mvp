@@ -16,14 +16,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Build with version
         run: |
           chmod +x build.sh
           ./build.sh
 
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+      - name: Cache npm
+        uses: actions/cache@v4
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy . --project-name=travel-assistant-hotel-mvp
+          path: ~/.npm
+          key: npm-wrangler-v3
+
+      - name: Install wrangler
+        run: |
+          for i in 1 2 3 4 5; do
+            npm install -g wrangler@3 && break
+            echo "Attempt \$i failed, retrying in 15s..."
+            sleep 15
+          done
+          wrangler --version
+
+      - name: Deploy to Cloudflare Pages
+        run: wrangler pages deploy . --project-name=travel-assistant-hotel-mvp
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
