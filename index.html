@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Hotel Nearby — หาโรงแรมใกล้ๆ</title>
+<meta name="description" content="ค้นหาโรงแรมใกล้ตำแหน่งคุณ แล้วกดจองได้เลย">
+<meta name="theme-color" content="#0ea5e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json?v=VERSION_PLACEHOLDER">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Sarabun', 'Noto Sans Thai', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #e0f2fe 0%, #ccfbf1 100%);
+  min-height: 100vh;
+  padding: 16px;
+  color: #0f172a;
+}
+.container { max-width: 480px; margin: 0 auto; }
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 24px 0 16px;
+}
+.header h1 {
+  font-size: 1.6rem;
+  color: #0369a1;
+  margin-bottom: 4px;
+}
+.header p {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.card:active {
+  transform: scale(0.98);
+}
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-size: 1.1rem;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.card p {
+  font-size: 0.85rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Buttons */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  text-decoration: none;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, #0ea5e9, #14b8a6);
+  color: white;
+  box-shadow: 0 4px 12px rgba(14,165,233,0.3);
+}
+.btn-secondary {
+  background: white;
+  color: #0369a1;
+  border: 2px solid #bae6fd;
+}
+.btn-open {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: white;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  transition: all 0.15s;
+}
+.btn-open:active { transform: scale(0.97); }
+.btn-sm {
+  display: inline-block;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+/* Pill buttons (radius selector) */
+.pills {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+.pill {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #bae6fd;
+  border-radius: 10px;
+  background: white;
+  color: #0369a1;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+.pill.active {
+  background: #0ea5e9;
+  color: white;
+  border-color: #0ea5e9;
+}
+
+/* Location info */
+.location-info {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 0.85rem;
+  color: #0369a1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.location-info .coords {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Provider card */
+.provider-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.provider-icon {
+  font-size: 2.2rem;
+  width: 48px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.provider-info {
+  flex: 1;
+  min-width: 0;
+}
+.provider-info h3 {
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 2px;
+}
+.provider-info p {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+.provider-action {
+  flex-shrink: 0;
+}
+
+/* Manual input */
+.input-group {
+  margin-bottom: 12px;
+}
+.input-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 4px;
+}
+.input-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: #0ea5e9;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 24px;
+  color: #64748b;
+}
+.spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #0ea5e9;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Footer nav */
+.footer-nav {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px 0;
+  margin-top: 8px;
+}
+.footer-link {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-decoration: none;
+  cursor: pointer;
+}
+.footer-link:hover { color: #0ea5e9; }
+
+/* Error */
+.error-box {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+/* Saved location */
+.saved-location {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.saved-location:active { transform: scale(0.98); }
+.saved-location .label {
+  font-size: 0.8rem;
+  color: #16a34a;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.saved-location .coords {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Settings */
+.setting-item {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.setting-item h3 {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+.version {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+  padding: 8px 0;
+}
+
+.gap-8 { margin-bottom: 8px; }
+.gap-12 { margin-bottom: 12px; }
+.gap-16 { margin-bottom: 16px; }
+.mt-8 { margin-top: 8px; }
+.text-center { text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.5rem;">🏨</div>
+    <h1>Hotel Nearby</h1>
+    <p>หาโรงแรมใกล้ๆ แล้วกดจอง</p>
+  </div>
+  <div id="content"></div>
+  <div class="footer-nav">
+    <a class="footer-link" onclick="navigate('')">หน้าหลัก</a>
+    <a class="footer-link" onclick="navigate('settings')">ตั้งค่า</a>
+  </div>
+</div>
+
+<script>
+// --- State ---
+let currentLat = null;
+let currentLng = null;
+let currentRadius = parseInt(localStorage.getItem('hotel_radius') || '5');
+let gpsLoading = false;
+let gpsError = null;
+let showManualInput = false;
+
+// --- Providers ---
+const PROVIDERS = [
+  {
+    id: 'google-maps',
+    name: 'Google Maps',
+    icon: '🗺️',
+    desc: 'ค้นหาโรงแรมบนแผนที่',
+    buildUrl: (lat, lng, r) => {
+      const zoom = r <= 2 ? 15 : r <= 5 ? 14 : 13;
+      return `https://www.google.com/maps/search/hotels/@${lat},${lng},${zoom}z`;
+    }
+  },
+  {
+    id: 'google-hotels',
+    name: 'Google Hotels',
+    icon: '🏨',
+    desc: 'เปรียบเทียบราคาจาก Google',
+    buildUrl: (lat, lng) =>
+      `https://www.google.com/travel/hotels?q=hotels+near+${lat}%2C${lng}`
+  },
+  {
+    id: 'booking',
+    name: 'Booking.com',
+    icon: '🅱️',
+    desc: 'จองโรงแรมราคาดี',
+    buildUrl: (lat, lng, r) =>
+      `https://www.booking.com/searchresults.html?ss=${lat}%2C+${lng}&latitude=${lat}&longitude=${lng}&radius=${r}`
+  },
+  {
+    id: 'agoda',
+    name: 'Agoda',
+    icon: '🔴',
+    desc: 'ดีลพิเศษในเอเชีย',
+    buildUrl: (lat, lng, r) =>
+      `https://www.agoda.com/search?latitude=${lat}&longitude=${lng}&radius=${r}&city=0`
+  }
+];
+
+// --- Navigation ---
+function navigate(page) {
+  window.location.hash = page ? '#/' + page : '#/';
+}
+
+function getPage() {
+  const hash = window.location.hash;
+  if (hash === '#/results') return 'results';
+  if (hash === '#/settings') return 'settings';
+  return 'home';
+}
+
+// --- GPS ---
+function requestGPS() {
+  if (!navigator.geolocation) {
+    gpsError = 'เบราว์เซอร์ไม่รองรับ GPS';
+    render();
+    return;
+  }
+  gpsLoading = true;
+  gpsError = null;
+  render();
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      currentLat = Math.round(pos.coords.latitude * 1000000) / 1000000;
+      currentLng = Math.round(pos.coords.longitude * 1000000) / 1000000;
+      localStorage.setItem('hotel_lat', currentLat);
+      localStorage.setItem('hotel_lng', currentLng);
+      localStorage.setItem('hotel_last_search', Date.now());
+      gpsLoading = false;
+      navigate('results');
+    },
+    (err) => {
+      gpsLoading = false;
+      if (err.code === 1) gpsError = 'ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง กรุณาเปิด GPS';
+      else if (err.code === 2) gpsError = 'ไม่สามารถหาตำแหน่งได้ กรุณาลองใหม่';
+      else gpsError = 'หมดเวลาในการหาตำแหน่ง กรุณาลองใหม่';
+      render();
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+  );
+}
+
+function useManualCoords() {
+  const latEl = document.getElementById('manual-lat');
+  const lngEl = document.getElementById('manual-lng');
+  const lat = parseFloat(latEl?.value);
+  const lng = parseFloat(lngEl?.value);
+  if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    gpsError = 'กรุณาใส่พิกัดที่ถูกต้อง (ละติจูด -90~90, ลองจิจูด -180~180)';
+    render();
+    return;
+  }
+  currentLat = Math.round(lat * 1000000) / 1000000;
+  currentLng = Math.round(lng * 1000000) / 1000000;
+  localStorage.setItem('hotel_lat', currentLat);
+  localStorage.setItem('hotel_lng', currentLng);
+  localStorage.setItem('hotel_last_search', Date.now());
+  navigate('results');
+}
+
+function useSavedLocation() {
+  const lat = parseFloat(localStorage.getItem('hotel_lat'));
+  const lng = parseFloat(localStorage.getItem('hotel_lng'));
+  if (!isNaN(lat) && !isNaN(lng)) {
+    currentLat = lat;
+    currentLng = lng;
+    navigate('results');
+  }
+}
+
+function setRadius(r) {
+  currentRadius = r;
+  localStorage.setItem('hotel_radius', r);
+  render();
+}
+
+// --- Render ---
+function render() {
+  const content = document.getElementById('content');
+  const page = getPage();
+
+  if (page === 'results') {
+    content.innerHTML = renderResults();
+  } else if (page === 'settings') {
+    content.innerHTML = renderSettings();
+  } else {
+    content.innerHTML = renderHome();
+  }
+}
+
+function renderHome() {
+  const savedLat = localStorage.getItem('hotel_lat');
+  const savedLng = localStorage.getItem('hotel_lng');
+  const savedTime = localStorage.getItem('hotel_last_search');
+  const hasSaved = savedLat && savedLng;
+
+  let html = '';
+
+  // GPS button
+  if (gpsLoading) {
+    html += `
+      <div class="card text-center">
+        <div class="loading">
+          <div class="spinner"></div>
+          <p class="mt-8">กำลังหาตำแหน่ง...</p>
+        </div>
+      </div>`;
+  } else {
+    html += `
+      <button class="btn btn-primary gap-12" onclick="requestGPS()">
+        📍 ใช้พิกัดปัจจุบัน
+      </button>`;
+  }
+
+  // Error
+  if (gpsError) {
+    html += `<div class="error-box gap-12">⚠️ ${gpsError}</div>`;
+  }
+
+  // Saved location
+  if (hasSaved) {
+    const ago = savedTime ? timeSince(parseInt(savedTime)) : '';
+    html += `
+      <div class="saved-location gap-12" onclick="useSavedLocation()">
+        <div class="label">📌 พิกัดล่าสุด ${ago ? '(' + ago + ')' : ''}</div>
+        <div class="coords">${savedLat}, ${savedLng}</div>
+      </div>`;
+  }
+
+  // Manual input toggle
+  if (showManualInput) {
+    html += `
+      <div class="card">
+        <h3 style="margin-bottom:12px;">✏️ ใส่พิกัดเอง</h3>
+        <div class="input-group">
+          <label>ละติจูด (Latitude)</label>
+          <input type="number" id="manual-lat" step="any" placeholder="เช่น 13.7563" inputmode="decimal">
+        </div>
+        <div class="input-group">
+          <label>ลองจิจูด (Longitude)</label>
+          <input type="number" id="manual-lng" step="any" placeholder="เช่น 100.5018" inputmode="decimal">
+        </div>
+        <button class="btn btn-primary" onclick="useManualCoords()">ค้นหาโรงแรม</button>
+      </div>`;
+  } else {
+    html += `
+      <button class="btn btn-secondary" onclick="showManualInput=true;render()">
+        ✏️ ใส่พิกัดเอง
+      </button>`;
+  }
+
+  return html;
+}
+
+function renderResults() {
+  if (!currentLat || !currentLng) {
+    const savedLat = parseFloat(localStorage.getItem('hotel_lat'));
+    const savedLng = parseFloat(localStorage.getItem('hotel_lng'));
+    if (!isNaN(savedLat) && !isNaN(savedLng)) {
+      currentLat = savedLat;
+      currentLng = savedLng;
+    } else {
+      navigate('');
+      return '';
+    }
+  }
+
+  let html = '';
+
+  // Location info
+  html += `
+    <div class="location-info">
+      <span>📍</span>
+      <div>
+        <div style="font-weight:600;">ตำแหน่งของคุณ</div>
+        <div class="coords">${currentLat}, ${currentLng}</div>
+      </div>
+    </div>`;
+
+  // Radius pills
+  html += `
+    <div style="font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:4px;">รัศมีการค้นหา</div>
+    <div class="pills gap-16">
+      <button class="pill ${currentRadius===2?'active':''}" onclick="setRadius(2)">2 km</button>
+      <button class="pill ${currentRadius===5?'active':''}" onclick="setRadius(5)">5 km</button>
+      <button class="pill ${currentRadius===10?'active':''}" onclick="setRadius(10)">10 km</button>
+      <button class="pill ${currentRadius===20?'active':''}" onclick="setRadius(20)">20 km</button>
+    </div>`;
+
+  // Provider cards
+  html += `<div style="font-size:0.85rem;font-weight:600;color:#475569;margin-bottom:8px;">เลือกช่องทางค้นหา</div>`;
+
+  for (const p of PROVIDERS) {
+    const url = p.buildUrl(currentLat, currentLng, currentRadius);
+    html += `
+      <div class="provider-card">
+        <div class="provider-icon">${p.icon}</div>
+        <div class="provider-info">
+          <h3>${p.name}</h3>
+          <p>${p.desc}</p>
+        </div>
+        <div class="provider-action">
+          <a class="btn-open btn-sm" href="${url}" target="_blank" rel="noopener">เปิด →</a>
+        </div>
+      </div>`;
+  }
+
+  // Change location button
+  html += `
+    <button class="btn btn-secondary mt-8" onclick="navigate('')">
+      🔄 เปลี่ยนตำแหน่ง
+    </button>`;
+
+  return html;
+}
+
+function renderSettings() {
+  const savedLat = localStorage.getItem('hotel_lat');
+  const savedLng = localStorage.getItem('hotel_lng');
+  const hasSaved = savedLat && savedLng;
+
+  let html = `<h2 style="font-size:1.2rem;color:#0369a1;margin-bottom:16px;">⚙️ ตั้งค่า</h2>`;
+
+  // Default radius
+  html += `
+    <div class="setting-item">
+      <h3>รัศมีเริ่มต้น</h3>
+      <div class="pills">
+        <button class="pill ${currentRadius===2?'active':''}" onclick="setRadius(2)">2 km</button>
+        <button class="pill ${currentRadius===5?'active':''}" onclick="setRadius(5)">5 km</button>
+        <button class="pill ${currentRadius===10?'active':''}" onclick="setRadius(10)">10 km</button>
+        <button class="pill ${currentRadius===20?'active':''}" onclick="setRadius(20)">20 km</button>
+      </div>
+    </div>`;
+
+  // Saved location
+  if (hasSaved) {
+    html += `
+      <div class="setting-item">
+        <h3>พิกัดที่บันทึกไว้</h3>
+        <p style="font-family:monospace;font-size:0.85rem;color:#64748b;margin-bottom:12px;">${savedLat}, ${savedLng}</p>
+        <button class="btn btn-secondary btn-sm" onclick="clearSavedLocation()">ล้างข้อมูลพิกัด</button>
+      </div>`;
+  }
+
+  // Version
+  html += `<div class="version">Hotel Nearby MVP v.VERSION_PLACEHOLDER</div>`;
+
+  return html;
+}
+
+function clearSavedLocation() {
+  localStorage.removeItem('hotel_lat');
+  localStorage.removeItem('hotel_lng');
+  localStorage.removeItem('hotel_last_search');
+  currentLat = null;
+  currentLng = null;
+  render();
+}
+
+// --- Helpers ---
+function timeSince(ts) {
+  const diff = Date.now() - ts;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'เมื่อกี้';
+  if (mins < 60) return mins + ' นาทีที่แล้ว';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + ' ชม.ที่แล้ว';
+  const days = Math.floor(hrs / 24);
+  return days + ' วันที่แล้ว';
+}
+
+// --- Init ---
+window.addEventListener('hashchange', render);
+window.addEventListener('DOMContentLoaded', () => {
+  // If no hash, set default
+  if (!window.location.hash) window.location.hash = '#/';
+  render();
+});
+
+// Service Worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js?v=VERSION_PLACEHOLDER');
+}
+</script>
+
+</body>
+</html>

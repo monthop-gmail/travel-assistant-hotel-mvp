@@ -1,0 +1,17 @@
+{
+  "name": "Hotel Nearby — หาโรงแรมใกล้ๆ",
+  "short_name": "Hotel Nearby",
+  "description": "ค้นหาโรงแรมใกล้ตำแหน่งคุณ แล้วกดจองได้เลย",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e0f2fe",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "version": "VERSION_PLACEHOLDER"
+}

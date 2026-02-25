@@ -16,6 +16,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Build with version
+        run: |
+          chmod +x build.sh
+          ./build.sh
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
