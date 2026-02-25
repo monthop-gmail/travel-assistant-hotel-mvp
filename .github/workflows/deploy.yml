@@ -12,17 +12,25 @@ jobs:
       contents: read
       deployments: write
 
-    # Avoid failing every push if secrets are not configured.
-    if: ${{ secrets.CF_API_TOKEN != '' && secrets.CF_ACCOUNT_ID != '' }}
+    env:
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Deploy skipped (missing Cloudflare secrets)
+        if: ${{ env.CF_API_TOKEN == '' || env.CF_ACCOUNT_ID == '' }}
+        run: |
+          echo "Cloudflare Pages deploy is skipped."
+          echo "Missing secrets: CF_API_TOKEN and/or CF_ACCOUNT_ID"
+
       - name: Deploy to Cloudflare Pages
+        if: ${{ env.CF_API_TOKEN != '' && env.CF_ACCOUNT_ID != '' }}
         uses: cloudflare/pages-action@v1
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          apiToken: ${{ env.CF_API_TOKEN }}
+          accountId: ${{ env.CF_ACCOUNT_ID }}
           projectName: ${{ vars.CF_PAGES_PROJECT || github.event.repository.name }}
           directory: ${{ vars.CF_PAGES_DIR || '.' }}
