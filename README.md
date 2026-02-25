@@ -4,6 +4,8 @@ Frontend-only MVP: ค้นหาโรงแรมใกล้ตำแหน�
 
 **Live:** https://travel-assistant-hotel-mvp.pages.dev
 
+**Playbook:** `docs/PLAYBOOK.md`
+
 ## Features
 
 - 📍 รับพิกัด GPS จากเบราว์เซอร์ หรือใส่เอง
