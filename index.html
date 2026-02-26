@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.json?v=VERSION_PLACEHOLDER">
+<script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
 <style>
@@ -650,13 +651,29 @@ function timeSince(ts) {
   return days + ' วันที่แล้ว';
 }
 
-// --- Init ---
-window.addEventListener('hashchange', render);
-window.addEventListener('DOMContentLoaded', () => {
-  // If no hash, set default
-  if (!window.location.hash) window.location.hash = '#/';
-  render();
-});
+  // --- Init ---
+  window.addEventListener('hashchange', render);
+  window.addEventListener('DOMContentLoaded', () => {
+    // If no hash, set default
+    if (!window.location.hash) window.location.hash = '#/';
+
+    // LIFF detection & auth flow
+    if (window.liff && liff.isInClient()) {
+      // Show LIFF login option
+      document.getElementById('content').innerHTML = `
+        <div class="card text-center gap-16">
+          <h2 style="font-size:1.4rem;color:#0369a1;">เข้าสู่ระบบด้วย LINE</h2>
+          <p style="color:#64748b;font-size:0.9rem;">คลิกเพื่อเข้าสู่ระบบ — เราจะเห็นเฉพาะชื่อแสดงผลและรูปภาพของคุณ (หากคุณยินยอม)</p>
+          <button class="btn btn-primary" onclick="liff.init({ liffId: \"2009240377-5UyB2gOT\" }).then(() => liff.login({ redirectUri: window.location.origin + '/callback.html' })).catch(err => console.error(err))">
+            💠 เข้าสู่ระบบด้วย LINE
+          </button>
+        </div>
+      `;
+    } else {
+      // Regular PWA flow
+      render();
+    }
+  });
 
 // Service Worker
 if ('serviceWorker' in navigator) {

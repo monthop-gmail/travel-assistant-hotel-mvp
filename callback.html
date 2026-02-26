@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Nearby — Callback</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+</head>
+<body>
+  <div style="text-align:center;padding:40px 16px;">
+    <div style="font-size:2.5rem;margin-bottom:16px;">🏠</div>
+    <h2 style="margin-bottom:8px;">กำลังโหลด...</h2>
+    <p style="color:#64748b;">กำลังเข้าสู่ระบบผ่าน LINE</p>
+  </div>
+  <script>
+    liff.init({ liffId: "2009240377-5UyB2gOT" })
+      .then(() => {
+        if (liff.isLoggedIn()) {
+          // Redirect to main app after login
+          window.location.href = "/";
+        } else {
+          // Should not happen — login should redirect back
+          window.location.href = "/?error=not_logged_in";
+        }
+      })
+      .catch(err => {
+        console.error("LIFF init failed:", err);
+        window.location.href = "/?error=liff_init_failed";
+      });
+  </script>
+</body>
+</html>
