@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hotel Nearby — LIFF</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+</head>
+<body>
+  <div id="app">
+    <p>Loading...</p>
+  </div>
+
+  <script>
+    // Wait for LIFF to initialize
+    liff.init({ liffId: "2009240377-5UyB2gOT" })
+      .then(() => {
+        if (!liff.isLoggedIn()) {
+          liff.login();
+        } else {
+          // Show profile after login
+          liff.getProfile()
+            .then(profile => {
+              document.getElementById("app").innerHTML = 
+                `<h2>ยินดีต้อนรับ ${profile.displayName}!</h2>
+                 <img src="${profile.pictureUrl}" width="80" /><br>
+                 <p>✅ พร้อมใช้งานแล้ว! คุณสามารถใช้ฟีเจอร์ต่าง ๆ ได้ผ่านเมนูด้านล่าง</p>`;
+            })
+            .catch(err => console.error("getProfile error:", err));
+        }
+      })
+      .catch((err) => {
+        console.error("LIFF init error:", err);
+        document.getElementById("app").innerHTML = 
+          `<p>❌ ไม่สามารถโหลดแอปผ่าน LINE ได้<br><small>โปรดลองใหม่หรือเปิดในเบราว์เซอร์</small></p>`;
+      });
+  </script>
+</body>
+</html>
