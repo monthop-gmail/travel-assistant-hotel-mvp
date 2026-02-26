@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hotel Nearby — เลือกบริการ</title>
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -19,6 +20,33 @@
       font-size: 1.5rem;
       color: #0369a1;
       margin-bottom: 24px;
+    }
+    .profile-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .profile-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 12px;
+      border: 3px solid #0ea5e9;
+    }
+    .profile-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    .profile-id {
+      font-size: 0.85rem;
+      color: #64748b;
+      font-family: monospace;
     }
     .service-grid {
       display: grid;
@@ -54,25 +82,49 @@
 </head>
 <body>
   <div class="container">
+    <div class="profile-section">
+      <img id="profile-img" src="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>" alt="Profile" class="profile-img">
+      <div class="profile-name" id="profile-name">กำลังโหลด...</div>
+      <div class="profile-id" id="profile-id">—</div>
+    </div>
     <h1>เลือกบริการ</h1>
     <div class="service-grid">
       <a href="/" class="service-btn">
-        <span>🏨</span>
-        <span>Hotel Nearby (PWA)</span>
+        <span>โรงแรมใกล้คุณ</span>
       </a>
       <a href="/booking.html" class="service-btn">
-        <span>💳</span>
         <span>จองห้องพัก</span>
       </a>
       <a href="/offers.html" class="service-btn">
-        <span>🎁</span>
         <span>ดีลพิเศษ</span>
       </a>
       <a href="/support.html" class="service-btn">
-        <span>🛠️</span>
         <span>สนับสนุน</span>
       </a>
     </div>
   </div>
+  <script>
+    liff.init({ liffId: "2009240377-5UyB2gOT" })
+      .then(() => {
+        if (liff.isLoggedIn()) {
+          liff.getProfile()
+            .then(profile => {
+              document.getElementById("profile-name").textContent = profile.displayName;
+              document.getElementById("profile-img").src = profile.pictureUrl || "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>";
+              document.getElementById("profile-id").textContent = profile.userId;
+            })
+            .catch(err => {
+              console.error("getProfile failed:", err);
+              document.getElementById("profile-name").textContent = "ไม่สามารถโหลดโปรไฟล์ได้";
+            });
+        } else {
+          document.getElementById("profile-name").textContent = "ยินดีต้อนรับ";
+        }
+      })
+      .catch(err => {
+        console.error("LIFF init failed:", err);
+        document.getElementById("profile-name").textContent = "LINE ไม่พร้อมใช้งาน";
+      });
+  </script>
 </body>
 </html>
