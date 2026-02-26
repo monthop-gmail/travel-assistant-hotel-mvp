@@ -24,7 +24,8 @@
               document.getElementById("app").innerHTML = 
                 `<h2>ยินดีต้อนรับ ${profile.displayName}!</h2>
                  <img src="${profile.pictureUrl}" width="80" /><br>
-                 <p>✅ พร้อมใช้งานแล้ว! คุณสามารถใช้ฟีเจอร์ต่าง ๆ ได้ผ่านเมนูด้านล่าง</p>`;
+                 <p>✅ พร้อมใช้งานแล้ว! คุณสามารถใช้ฟีเจอร์ต่าง ๆ ได้ผ่านเมนูด้านล่าง</p>
+<button onclick="location.href='/'" class="btn btn-primary" style="margin-top:16px;">ไปยังเว็บแอปหลัก</button>`;
             })
             .catch(err => console.error("getProfile error:", err));
         }
