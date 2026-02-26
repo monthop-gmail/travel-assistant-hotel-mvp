@@ -1,40 +1,78 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hotel Nearby — LIFF</title>
-  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+  <title>Hotel Nearby — เลือกบริการ</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', 'Noto Sans Thai', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #ccfbf1 100%);
+      min-height: 100vh;
+      padding: 24px 16px;
+      color: #0f172a;
+    }
+    .container { max-width: 480px; margin: 0 auto; }
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #0369a1;
+      margin-bottom: 24px;
+    }
+    .service-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .service-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 16px;
+      background: white;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0369a1;
+      text-decoration: none;
+      border: 2px solid #bae6fd;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .service-btn:hover, .service-btn:active {
+      background: #0ea5e9;
+      color: white;
+      border-color: #0ea5e9;
+      transform: scale(0.99);
+    }
+    .service-btn span {
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <p>Loading...</p>
+  <div class="container">
+    <h1>เลือกบริการ</h1>
+    <div class="service-grid">
+      <a href="/" class="service-btn">
+        <span>🏨</span>
+        <span>Hotel Nearby (PWA)</span>
+      </a>
+      <a href="/booking.html" class="service-btn">
+        <span>💳</span>
+        <span>จองห้องพัก</span>
+      </a>
+      <a href="/offers.html" class="service-btn">
+        <span>🎁</span>
+        <span>ดีลพิเศษ</span>
+      </a>
+      <a href="/support.html" class="service-btn">
+        <span>🛠️</span>
+        <span>สนับสนุน</span>
+      </a>
+    </div>
   </div>
-
-  <script>
-    // Wait for LIFF to initialize
-    liff.init({ liffId: "2009240377-5UyB2gOT" })
-      .then(() => {
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          // Show profile after login
-          liff.getProfile()
-            .then(profile => {
-              document.getElementById("app").innerHTML = 
-                `<h2>ยินดีต้อนรับ ${profile.displayName}!</h2>
-                 <img src="${profile.pictureUrl}" width="80" /><br>
-                 <p>✅ พร้อมใช้งานแล้ว! คุณสามารถใช้ฟีเจอร์ต่าง ๆ ได้ผ่านเมนูด้านล่าง</p>
-<button onclick="location.href='/'" class="btn btn-primary" style="margin-top:16px;">ไปยังเว็บแอปหลัก</button>`;
-            })
-            .catch(err => console.error("getProfile error:", err));
-        }
-      })
-      .catch((err) => {
-        console.error("LIFF init error:", err);
-        document.getElementById("app").innerHTML = 
-          `<p>❌ ไม่สามารถโหลดแอปผ่าน LINE ได้<br><small>โปรดลองใหม่หรือเปิดในเบราว์เซอร์</small></p>`;
-      });
-  </script>
 </body>
 </html>
